@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+
 import 'package:hive_notes_app/models/note.dart';
 
-class AddNotePage extends StatefulWidget {
-  const AddNotePage({Key? key}) : super(key: key);
+class EditNotePage extends StatefulWidget {
+  const EditNotePage({Key? key, required this.note}) : super(key: key);
+
+  final Note note;
 
   @override
-  State<AddNotePage> createState() => _AddNotePageState();
+  State<EditNotePage> createState() => _EditNotePageState();
 }
 
-class _AddNotePageState extends State<AddNotePage> {
+class _EditNotePageState extends State<EditNotePage> {
+  void editNote(Note note, String title, String description) {
+    note.title = title;
+    note.description = description;
+
+    note.save();
+  }
+
   final formKey = GlobalKey<FormState>();
   String title = '';
   String description = '';
@@ -46,15 +55,14 @@ class _AddNotePageState extends State<AddNotePage> {
                   onPressed: () {
                     final isValid = formKey.currentState!.validate();
                     if (isValid) {
-                      Box<Note> box = Hive.box<Note>('notes');
+                      editNote(widget.note, title, description);
 
-                      box.add(Note(title: title, description: description));
                       Navigator.of(context).pop();
                     }
                   },
                   child: const Center(
                     child: Text(
-                      'Add note',
+                      'Edit note',
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.w700,
@@ -72,14 +80,19 @@ class _AddNotePageState extends State<AddNotePage> {
 
   Widget buildDescription() {
     return TextFormField(
+      initialValue: widget.note.description,
       decoration: const InputDecoration(
-          label: Text('Add note description'), border: OutlineInputBorder()),
+        label: Text('Add note description'),
+        border: OutlineInputBorder(),
+      ),
       validator: (value) {
         if (value != null && value.length < 2) {
           return 'Enter at least 2 characters';
-        } else {
-          return null;
         }
+        if (value != null && value == widget.note.description) {
+          return 'Modify your description before moving forward!';
+        }
+        return null;
       },
       onChanged: (value) {
         description = value;
@@ -89,6 +102,7 @@ class _AddNotePageState extends State<AddNotePage> {
 
   Widget buildTitle() {
     return TextFormField(
+      initialValue: widget.note.title,
       decoration: const InputDecoration(
         label: Text('Add note title'),
         border: OutlineInputBorder(),
@@ -96,9 +110,11 @@ class _AddNotePageState extends State<AddNotePage> {
       validator: (value) {
         if (value != null && value.length < 2) {
           return 'Enter at least 2 characters';
-        } else {
-          return null;
         }
+        if (value != null && value == widget.note.title) {
+          return 'Modify your title before moving forward!';
+        }
+        return null;
       },
       onChanged: (value) {
         title = value;

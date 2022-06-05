@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive_notes_app/models/note.dart';
 import 'package:hive_notes_app/screens/add_note_page.dart';
+import 'package:hive_notes_app/screens/edit_note.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -93,6 +94,13 @@ class _HomePageState extends State<HomePage> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+            ),
+            trailing: IconButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => EditNotePage(note: note)));
+              },
+              icon: const Icon(Icons.edit),
             ),
           );
         });
